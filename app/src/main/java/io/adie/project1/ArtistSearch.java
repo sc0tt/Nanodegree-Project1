@@ -37,9 +37,9 @@ import retrofit.client.Response;
 
 
 public class ArtistSearch extends AppCompatActivity {
-    public final static String ARTIST_ID = "com.mycompany.myfirstapp.ARTIST_ID";
-    public final static String ARTIST_NAME = "com.mycompany.myfirstapp.ARTIST_NAME";
-    public final static String ARTIST_RESULTS = "com.mycompany.myfirstapp.RESULTS";
+    public final static String ARTIST_ID = "io.adie.project1.ARTIST_ID";
+    public final static String ARTIST_NAME = "io.adie.project1.ARTIST_NAME";
+    public final static String ARTIST_RESULTS = "io.adie.project1.RESULTS";
     static final String TAG = ArtistSearch.class.getSimpleName();
     final Runnable failedSearch = new Runnable() {
         @Override
