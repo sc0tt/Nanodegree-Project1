@@ -62,6 +62,8 @@ public class TopTracks extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_tracks);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent intent = getIntent();
         artistName = intent.getStringExtra(ArtistSearch.ARTIST_NAME);
         artistId = intent.getStringExtra(ArtistSearch.ARTIST_ID);

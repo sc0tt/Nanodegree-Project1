@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,11 +79,7 @@ public class ArtistSearch extends AppCompatActivity {
         searchTermView = (EditText) findViewById(R.id.artist_search);
         artists = new ArrayList<Artist>();
 
-        if (savedInstanceState != null) {
-            adapter = (ArtistListAdapter) savedInstanceState.getSerializable(ARTIST_RESULTS);
-        } else {
-            adapter = new ArtistListAdapter(this, artists);
-        }
+        adapter = new ArtistListAdapter(this, artists);
 
 
         artistListView.setAdapter(adapter);
@@ -137,7 +132,7 @@ public class ArtistSearch extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class ArtistListAdapter extends BaseAdapter implements Serializable {
+    public class ArtistListAdapter extends BaseAdapter {
 
         Context ctx;
         List<Artist> artists;
