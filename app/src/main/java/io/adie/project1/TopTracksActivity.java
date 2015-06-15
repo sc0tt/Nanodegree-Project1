@@ -4,9 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,8 +37,9 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class TopTracks extends AppCompatActivity {
-    static final String TAG = ArtistSearch.class.getSimpleName();
+public class TopTracksActivity extends AppCompatActivity {
+    public final static String SONG_RESULTS = "io.adie.project1.SONG_RESULTS";
+    static final String TAG = ArtistSearchActivity.class.getSimpleName();
     final Runnable failedSearch = new Runnable() {
         @Override
         public void run() {
@@ -53,7 +56,9 @@ public class TopTracks extends AppCompatActivity {
     final Runnable updateResult = new Runnable() {
         @Override
         public void run() {
-            adapter.notifyDataSetChanged();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
         }
     };
 
@@ -62,21 +67,50 @@ public class TopTracks extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_tracks);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         Intent intent = getIntent();
-        artistName = intent.getStringExtra(ArtistSearch.ARTIST_NAME);
-        artistId = intent.getStringExtra(ArtistSearch.ARTIST_ID);
+        artistName = intent.getStringExtra(ArtistSearchActivity.ARTIST_NAME);
+        artistId = intent.getStringExtra(ArtistSearchActivity.ARTIST_ID);
 
         actionBarSetup(artistName);
 
         songListView = (ListView) findViewById(R.id.song_list);
         tracks = new ArrayList<Track>();
-        adapter = new TrackListAdapter(this, tracks);
-        songListView.setAdapter(adapter);
+        if (savedInstanceState != null) {
+            adapter = savedInstanceState.getParcelable(SONG_RESULTS);
+        } else {
+            adapter = new TrackListAdapter(this, tracks);
+            Map<String, Object> httpOptions = new HashMap<String, Object>();
+            httpOptions.put("country", "US");
+            spotify.getArtistTopTrack(artistId, httpOptions, new Callback<Tracks>() {
+                @Override
+                public void success(Tracks resultingTracks, Response response) {
+                    List<Track> results = resultingTracks.tracks;
+                    if (results.size() > 0) {
+                        tracks.addAll(results);
+                        runOnUiThread(updateResult);
+                    } else {
+                        runOnUiThread(failedSearch);
+                    }
+                    runOnUiThread(updateResult);
+                }
 
-        TopTenSongTask task = new TopTenSongTask();
-        task.execute(artistId);
+                @Override
+                public void failure(RetrofitError error) {
+                    runOnUiThread(failedSearch);
+                }
+            });
+        }
+
+        songListView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedState) {
+
+        super.onSaveInstanceState(savedState);
+
+        // Note: getValues() is a method in your ArrayAdaptor subclass
+        savedState.putParcelable(SONG_RESULTS, adapter);
 
     }
 
@@ -102,14 +136,15 @@ public class TopTracks extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public class TrackListAdapter extends BaseAdapter {
+    public class TrackListAdapter extends BaseAdapter implements Parcelable {
 
         Context ctx;
         List<Track> tracks;
@@ -121,6 +156,15 @@ public class TopTracks extends AppCompatActivity {
 
         public List<Track> getTracks() {
             return tracks;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+
+        }
+
+        public int describeContents() {
+            return 0;
         }
 
         @Override
@@ -175,45 +219,6 @@ public class TopTracks extends AppCompatActivity {
             ImageView ivAlbumArt;
             TextView tvSongName;
             TextView tvSongAlbum;
-        }
-    }
-
-    private class TopTenSongTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            Map<String, Object> httpOptions = new HashMap<String, Object>();
-            httpOptions.put("country", "US");
-            spotify.getArtistTopTrack(params[0], httpOptions, new Callback<Tracks>() {
-                @Override
-                public void success(Tracks resultingTracks, Response response) {
-                    List<Track> results = resultingTracks.tracks;
-                    if (results.size() > 0) {
-                        tracks.addAll(results);
-                        runOnUiThread(updateResult);
-                    } else {
-                        runOnUiThread(failedSearch);
-                    }
-                    runOnUiThread(updateResult);
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    runOnUiThread(failedSearch);
-                }
-            });
-            return "";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
         }
     }
 }

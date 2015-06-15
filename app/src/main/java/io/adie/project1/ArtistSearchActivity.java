@@ -3,20 +3,20 @@ package io.adie.project1;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,11 +36,11 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 import retrofit.client.Response;
 
 
-public class ArtistSearch extends AppCompatActivity {
+public class ArtistSearchActivity extends AppCompatActivity {
     public final static String ARTIST_ID = "io.adie.project1.ARTIST_ID";
     public final static String ARTIST_NAME = "io.adie.project1.ARTIST_NAME";
-    public final static String ARTIST_RESULTS = "io.adie.project1.RESULTS";
-    static final String TAG = ArtistSearch.class.getSimpleName();
+    public final static String ARTIST_RESULTS = "io.adie.project1.ARTIST_RESULTS";
+    static final String TAG = ArtistSearchActivity.class.getSimpleName();
     final Runnable failedSearch = new Runnable() {
         @Override
         public void run() {
@@ -51,24 +51,26 @@ public class ArtistSearch extends AppCompatActivity {
     SpotifyService spotify = api.getService();
     List<Artist> artists;
     ListView artistListView;
-    EditText searchTermView;
+    SearchView searchTermView;
     ArtistListAdapter adapter;
+    final Runnable updateResult = new Runnable() {
+        @Override
+        public void run() {
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    };
 
-    /*@Override
+    @Override
     public void onSaveInstanceState(Bundle savedState) {
 
         super.onSaveInstanceState(savedState);
 
         // Note: getValues() is a method in your ArrayAdaptor subclass
-        savedState.putSerializable(ARTIST_RESULTS, adapter);
+        savedState.putParcelable(ARTIST_RESULTS, adapter);
 
-    }*/
-    final Runnable updateResult = new Runnable() {
-        @Override
-        public void run() {
-            adapter.notifyDataSetChanged();
-        }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +78,14 @@ public class ArtistSearch extends AppCompatActivity {
 
         setContentView(R.layout.activity_artist_search);
         artistListView = (ListView) findViewById(R.id.artist_list);
-        searchTermView = (EditText) findViewById(R.id.artist_search);
+        searchTermView = (SearchView) findViewById(R.id.artist_search);
         artists = new ArrayList<Artist>();
 
-        adapter = new ArtistListAdapter(this, artists);
-
+        if (savedInstanceState != null) {
+            adapter = savedInstanceState.getParcelable(ARTIST_RESULTS);
+        } else {
+            adapter = new ArtistListAdapter(this, artists);
+        }
 
         artistListView.setAdapter(adapter);
 
@@ -88,25 +93,45 @@ public class ArtistSearch extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
                 Artist chosenArtist = (Artist) adapter.getItem(position);
-                Intent intent = new Intent(getApplicationContext(), TopTracks.class);
+                Intent intent = new Intent(getApplicationContext(), TopTracksActivity.class);
                 intent.putExtra(ARTIST_ID, chosenArtist.id);
                 intent.putExtra(ARTIST_NAME, chosenArtist.name);
                 startActivity(intent);
             }
         });
 
-        searchTermView.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+        searchTermView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    Log.d(TAG, "Searching for " + v.getText());
-                    artists.clear();
-                    adapter.notifyDataSetChanged();
-                    ArtistSearchTask runner = new ArtistSearchTask();
-                    runner.execute(v.getText().toString());
-                }
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "Searching for " + query);
+                artists.clear();
+                adapter.notifyDataSetChanged();
+                spotify.searchArtists(query, new SpotifyCallback<ArtistsPager>() {
+                    @Override
+                    public void failure(SpotifyError spotifyError) {
+                        runOnUiThread(failedSearch);
+                    }
+
+                    @Override
+                    public void success(ArtistsPager artistsPager, Response response) {
+                        List<Artist> results = artistsPager.artists.items;
+                        if (results.size() > 0) {
+                            artists.addAll(results);
+                            runOnUiThread(updateResult);
+                        } else {
+                            runOnUiThread(failedSearch);
+                        }
+
+                    }
+                });
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
                 return false;
             }
+
         });
     }
 
@@ -125,14 +150,15 @@ public class ArtistSearch extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public class ArtistListAdapter extends BaseAdapter {
+    public class ArtistListAdapter extends BaseAdapter implements Parcelable {
 
         Context ctx;
         List<Artist> artists;
@@ -144,6 +170,15 @@ public class ArtistSearch extends AppCompatActivity {
 
         public List<Artist> getArtists() {
             return artists;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+
+        }
+
+        public int describeContents() {
+            return 0;
         }
 
         @Override
@@ -195,43 +230,6 @@ public class ArtistSearch extends AppCompatActivity {
         public class ArtistHolder {
             ImageView ivArtist;
             TextView tvArtist;
-        }
-    }
-
-    private class ArtistSearchTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            spotify.searchArtists(params[0], new SpotifyCallback<ArtistsPager>() {
-                @Override
-                public void failure(SpotifyError spotifyError) {
-                    runOnUiThread(failedSearch);
-                }
-
-                @Override
-                public void success(ArtistsPager artistsPager, Response response) {
-                    List<Artist> results = artistsPager.artists.items;
-                    if (results.size() > 0) {
-                        artists.addAll(results);
-                        runOnUiThread(updateResult);
-                    } else {
-                        runOnUiThread(failedSearch);
-                    }
-
-                }
-            });
-            return "";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
         }
     }
 }

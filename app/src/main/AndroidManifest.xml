@@ -10,9 +10,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ArtistSearch"
-            android:label="@string/app_name"
-            android:configChanges="orientation|screenSize">
+            android:name=".ArtistSearchActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,13 +19,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TopTracks"
+            android:name=".TopTracksActivity"
             android:label="@string/title_activity_top_tracks"
-            android:configChanges="orientation|screenSize"
-            android:parentActivityName=".ArtistSearch" >
+            android:parentActivityName=".ArtistSearchActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.adie.project1.ArtistSearch" />
+                android:value=".ArtistSearchActivity" />
         </activity>
     </application>
 
