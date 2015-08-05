@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,7 +40,9 @@ import retrofit.client.Response;
 
 public class TopTracksActivity extends AppCompatActivity {
     public final static String SONG_RESULTS = "io.adie.project1.SONG_RESULTS";
+    public final static String SONG_INDEX = "io.adie.project1.SONG_INDEX";
     static final String TAG = ArtistSearchActivity.class.getSimpleName();
+    public static List<Track> tracks;
     final Runnable failedSearch = new Runnable() {
         @Override
         public void run() {
@@ -50,7 +53,6 @@ public class TopTracksActivity extends AppCompatActivity {
     String artistId;
     SpotifyApi api = new SpotifyApi();
     SpotifyService spotify = api.getService();
-    List<Track> tracks;
     ListView songListView;
     TrackListAdapter adapter;
     final Runnable updateResult = new Runnable() {
@@ -102,6 +104,15 @@ public class TopTracksActivity extends AppCompatActivity {
         }
 
         songListView.setAdapter(adapter);
+
+        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View v, int position, long unused) {
+                Intent intent = new Intent(TopTracksActivity.this, PlayerActivity.class);
+                intent.putExtra(SONG_INDEX, position);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
