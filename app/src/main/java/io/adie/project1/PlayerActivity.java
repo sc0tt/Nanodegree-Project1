@@ -1,8 +1,6 @@
 package io.adie.project1;
 
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -13,8 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
 
 import kaaes.spotify.webapi.android.models.Track;
 
@@ -33,7 +29,7 @@ public class PlayerActivity extends AppCompatActivity {
     ImageButton nextTrack;
     ImageButton prevTrack;
 
-    MediaPlayer player;
+    PlayerService playerService;
 
     private boolean playing = false;
 
@@ -46,6 +42,8 @@ public class PlayerActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentSongIndex = intent.getIntExtra(TopTracksActivity.SONG_INDEX, 0);
 
+        playerService = new PlayerService();
+
         songName = (TextView) findViewById(R.id.player_song);
         artistName = (TextView) findViewById(R.id.player_artist);
         albumName = (TextView) findViewById(R.id.player_album);
@@ -54,9 +52,6 @@ public class PlayerActivity extends AppCompatActivity {
         prevTrack = (ImageButton) findViewById(R.id.prevTrack);
         playPauseTrack = (ImageButton) findViewById(R.id.playPause);
         nextTrack = (ImageButton) findViewById(R.id.nextTrack);
-
-        player = new MediaPlayer();
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         Track selectedTrack = TopTracksActivity.tracks.get(currentSongIndex);
         playSong(selectedTrack);
@@ -79,9 +74,9 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (playing) {
-                    player.pause();
+                    playerService.mMediaPlayer.pause();
                 } else {
-                    player.start();
+                    playerService.mMediaPlayer.pause();
                 }
                 updatePlayPauseIcon();
                 playing = !playing;
@@ -143,16 +138,8 @@ public class PlayerActivity extends AppCompatActivity {
         albumName.setText(t.album.name);
         Picasso.with(PlayerActivity.this).load(t.album.images.get(0).url).into(albumArt);
 
-        try {
-            player.setDataSource(t.preview_url);
-            player.prepare();
-            player.start();
-            int minutes = (int) ((player.getDuration() / 1000) / 60);
-            int seconds = (int) ((player.getDuration() / 1000) % 60);
-            totalTime.setText(minutes + ":" + seconds);
-
-        } catch (IOException e) {
-            // todo
-        }
+        Intent playIntent = new Intent(PlayerActivity.this, PlayerService.class);
+        playIntent.putExtra(PlayerService.STREAM_URL, t.preview_url);
+        this.startService(playIntent);
     }
 }
