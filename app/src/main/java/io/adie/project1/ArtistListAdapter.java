@@ -27,6 +27,21 @@ public class ArtistListAdapter extends BaseAdapter implements Parcelable {
         this.artists = artists;
     }
 
+    public ArtistListAdapter(Parcel in) {
+        in.readArray(TrackListAdapter.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<ArtistListAdapter> CREATOR
+            = new Parcelable.Creator<ArtistListAdapter>() {
+        public ArtistListAdapter createFromParcel(Parcel in) {
+            return new ArtistListAdapter(in);
+        }
+
+        public ArtistListAdapter[] newArray(int size) {
+            return new ArtistListAdapter[size];
+        }
+    };
+
     public List<Artist> getArtists() {
         return artists;
     }
@@ -42,7 +57,7 @@ public class ArtistListAdapter extends BaseAdapter implements Parcelable {
 
     @Override
     public int getCount() {
-        return artists.size();
+        return artists == null ? 0 : artists.size();
     }
 
     @Override

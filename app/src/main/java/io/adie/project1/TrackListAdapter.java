@@ -19,12 +19,26 @@ import kaaes.spotify.webapi.android.models.Track;
 
 public class TrackListAdapter extends BaseAdapter implements Parcelable {
 
+    public static final Parcelable.Creator<TrackListAdapter> CREATOR
+            = new Parcelable.Creator<TrackListAdapter>() {
+        public TrackListAdapter createFromParcel(Parcel in) {
+            return new TrackListAdapter(in);
+        }
+
+        public TrackListAdapter[] newArray(int size) {
+            return new TrackListAdapter[size];
+        }
+    };
     Context ctx;
     List<Track> tracks;
 
     TrackListAdapter(Context ctx, List<Track> tracks) {
         this.ctx = ctx;
         this.tracks = tracks;
+    }
+
+    public TrackListAdapter(Parcel in) {
+        in.readArray(TrackListAdapter.class.getClassLoader());
     }
 
     public List<Track> getTracks() {
@@ -42,7 +56,7 @@ public class TrackListAdapter extends BaseAdapter implements Parcelable {
 
     @Override
     public int getCount() {
-        return tracks.size();
+        return tracks == null ? 0 : tracks.size();
     }
 
     @Override

@@ -34,6 +34,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.adie.project1.TopTracksActivity" />
         </activity>
+        <service
+            android:name=".PlayerService"
+            android:label="Spotify Player" >
+        </service>
+
     </application>
 
 </manifest>
