@@ -36,7 +36,7 @@ public class TopTracksActivity extends AppCompatActivity {
 
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.top_tracks_container, f).addToBackStack("test").commit();
+        transaction.add(R.id.top_tracks_container, f).addToBackStack(TAG).commit();
 
 
     }
