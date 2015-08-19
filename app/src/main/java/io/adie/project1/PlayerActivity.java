@@ -51,7 +51,7 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_player);
 
         Intent intent = getIntent();
-        currentSongIndex = intent.getIntExtra(TopTracksActivity.SONG_INDEX, 0);
+        currentSongIndex = intent.getIntExtra(TopTracksFragment.SONG_INDEX, 0);
 
         playerService = new PlayerService();
 
@@ -66,7 +66,7 @@ public class PlayerActivity extends AppCompatActivity {
         nextTrack = (ImageButton) findViewById(R.id.nextTrack);
         seekBar = (SeekBar) findViewById(R.id.song_seek_bar);
 
-        Track selectedTrack = TopTracksActivity.tracks.get(currentSongIndex);
+        Track selectedTrack = TopTracksFragment.tracks.get(currentSongIndex);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -94,12 +94,12 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (currentSongIndex == 0) {
-                    currentSongIndex = (TopTracksActivity.tracks.size() - 1);
+                    currentSongIndex = (TopTracksFragment.tracks.size() - 1);
                 } else {
                     currentSongIndex--;
                 }
 
-                Track selectedTrack = TopTracksActivity.tracks.get(currentSongIndex);
+                Track selectedTrack = TopTracksFragment.tracks.get(currentSongIndex);
                 playSong(selectedTrack);
             }
         });
@@ -122,12 +122,12 @@ public class PlayerActivity extends AppCompatActivity {
         nextTrack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentSongIndex == (TopTracksActivity.tracks.size() - 1)) {
+                if (currentSongIndex == (TopTracksFragment.tracks.size() - 1)) {
                     currentSongIndex = 0;
                 } else {
                     currentSongIndex++;
                 }
-                Track selectedTrack = TopTracksActivity.tracks.get(currentSongIndex);
+                Track selectedTrack = TopTracksFragment.tracks.get(currentSongIndex);
                 playSong(selectedTrack);
             }
         });
@@ -170,7 +170,7 @@ public class PlayerActivity extends AppCompatActivity {
             requestSongCurr.setAction(PlayerService.REQUEST_POSITION);
             sendBroadcast(requestSongCurr);
 
-            Track currentTrack = TopTracksActivity.tracks.get(currentSongIndex);
+            Track currentTrack = TopTracksFragment.tracks.get(currentSongIndex);
             updateUIComponents(currentTrack);
         } else {
             playSong(selectedTrack);
