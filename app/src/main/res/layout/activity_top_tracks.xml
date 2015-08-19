@@ -9,13 +9,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".TopTracksActivity">
 
-    <fragment
+    <FrameLayout
         android:id="@+id/top_tracks_container"
-        android:name="io.adie.project1.TopTracksFragment"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-    </fragment>
+    </FrameLayout>
 
 
 </LinearLayout>

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 public class ArtistSearchActivity extends AppCompatActivity {
     static final String TAG = ArtistSearchActivity.class.getSimpleName();
+    static boolean isMasterDetails = false;
 
     @Override
     public void onSaveInstanceState(Bundle savedState) {
@@ -19,6 +20,10 @@ public class ArtistSearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_search);
+
+        if(findViewById(R.id.top_tracks_container) != null) {
+            ArtistSearchActivity.isMasterDetails = true;
+        }
     }
 
     @Override

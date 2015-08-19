@@ -1,108 +1,14 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="io.adie.project1.PlayerActivity">
+    <FrameLayout
+        android:id="@+id/player_container"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-        <TextView
-            android:id="@+id/player_artist"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Artist" />
-
-        <TextView
-            android:id="@+id/player_album"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Album" />
-
-        <ImageView
-            android:id="@+id/player_art"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/player_song"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Song" />
-
-        <SeekBar
-            android:id="@+id/song_seek_bar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/play_current_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:text="0:00" />
-
-            <TextView
-                android:id="@+id/play_total_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:text="0:00" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-
-            <ImageButton
-                android:id="@+id/prevTrack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_weight="1"
-
-                android:src="@android:drawable/ic_media_previous"
-                android:tint="@color/primary_dark_material_dark" />
-
-            <ImageButton
-                android:id="@+id/playPause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_weight="1"
-                android:src="@android:drawable/ic_media_pause"
-                android:tint="@color/primary_dark_material_dark" />
-
-            <ImageButton
-                android:id="@+id/nextTrack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_weight="1"
-                android:src="@android:drawable/ic_media_next"
-                android:tint="@color/primary_dark_material_dark" />
-        </LinearLayout>
+    </FrameLayout>
 
 
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

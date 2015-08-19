@@ -1,6 +1,8 @@
 package io.adie.project1;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -92,9 +94,23 @@ public class TopTracksFragment extends Fragment {
         songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long unused) {
-                Intent intent = new Intent(getActivity(), PlayerActivity.class);
-                intent.putExtra(SONG_INDEX, position);
-                startActivity(intent);
+                if(ArtistSearchActivity.isMasterDetails) {
+                    PlayerFragment f = new PlayerFragment();
+                    Bundle b = new Bundle();
+                    b.putInt(TopTracksFragment.SONG_INDEX, position);
+
+                    f.setArguments(b);
+
+                    FragmentManager manager = getFragmentManager();
+
+                    f.show(manager, TAG);
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), PlayerActivity.class);
+                    intent.putExtra(SONG_INDEX, position);
+                    startActivity(intent);
+                }
+
             }
         });
 

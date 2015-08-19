@@ -1,6 +1,8 @@
 package io.adie.project1;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -74,10 +76,26 @@ public class ArtistSearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
                 Artist chosenArtist = (Artist) adapter.getItem(position);
-                Intent intent = new Intent(getActivity(), TopTracksActivity.class);
-                intent.putExtra(ARTIST_ID, chosenArtist.id);
-                intent.putExtra(ARTIST_NAME, chosenArtist.name);
-                startActivity(intent);
+
+                if(ArtistSearchActivity.isMasterDetails) {
+                    TopTracksFragment f = new TopTracksFragment();
+
+                    Bundle b = new Bundle();
+                    b.putString(ArtistSearchFragment.ARTIST_NAME, chosenArtist.name);
+                    b.putString(ArtistSearchFragment.ARTIST_ID, chosenArtist.id);
+
+                    f.setArguments(b);
+
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    transaction.replace(R.id.top_tracks_container, f).addToBackStack(TAG).commit();
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), TopTracksActivity.class);
+                    intent.putExtra(ARTIST_ID, chosenArtist.id);
+                    intent.putExtra(ARTIST_NAME, chosenArtist.name);
+                    startActivity(intent);
+                }
             }
         });
 
