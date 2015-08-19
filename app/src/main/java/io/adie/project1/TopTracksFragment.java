@@ -81,6 +81,7 @@ public class TopTracksFragment extends Fragment {
 
                 @Override
                 public void failure(RetrofitError error) {
+                    Log.e(TAG, error.getLocalizedMessage());
                     getActivity().runOnUiThread(failedSearch);
                 }
             });
