@@ -1,14 +1,11 @@
 package io.adie.project1;
 
-import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +17,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import kaaes.spotify.webapi.android.models.Track;
 
 
@@ -29,7 +28,16 @@ public class PlayerFragment extends DialogFragment {
     static final String IS_PLAYING = "io.adie.project1.IS_PLAYING";
 
     int currentSongIndex;
+    ArrayList<String> songs = new ArrayList<>();
+
+    Track currentTrack;
     TrackListAdapter tracks;
+
+    ArrayList<String> previewURLs = new ArrayList<>();
+    ArrayList<String> artists = new ArrayList<>();
+    ArrayList<String> albums = new ArrayList<>();
+    ArrayList<String> titles = new ArrayList<>();
+    ArrayList<String> artwork = new ArrayList<>();
 
     TextView songName;
     TextView artistName;
@@ -70,11 +78,13 @@ public class PlayerFragment extends DialogFragment {
 
         Bundle args = getArguments();
 
-        tracks = args.getParcelable(TopTracksFragment.SONG_RESULTS);
+        previewURLs = args.getStringArrayList(TopTracksFragment.URLS);
+        artists = args.getStringArrayList(TopTracksFragment.ARTISTS);
+        albums = args.getStringArrayList(TopTracksFragment.ALBUMS);
+        titles = args.getStringArrayList(TopTracksFragment.TITLES);
+        artwork = args.getStringArrayList(TopTracksFragment.ARTWORK);
+
         currentSongIndex = args.getInt(TopTracksFragment.SONG_INDEX);
-
-
-        Track selectedTrack = (Track)tracks.getItem(currentSongIndex);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -102,13 +112,12 @@ public class PlayerFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (currentSongIndex == 0) {
-                    currentSongIndex = (tracks.getCount() - 1);
+                    currentSongIndex = (previewURLs.size() - 1);
                 } else {
                     currentSongIndex--;
                 }
 
-                Track selectedTrack = (Track)tracks.getItem(currentSongIndex);
-                playSong(selectedTrack);
+                playSong(currentSongIndex);
             }
         });
 
@@ -130,13 +139,12 @@ public class PlayerFragment extends DialogFragment {
         nextTrack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentSongIndex == (tracks.getCount() - 1)) {
+                if (currentSongIndex == (previewURLs.size() - 1)) {
                     currentSongIndex = 0;
                 } else {
                     currentSongIndex++;
                 }
-                Track selectedTrack = (Track)tracks.getItem(currentSongIndex);
-                playSong(selectedTrack);
+                playSong(currentSongIndex);
             }
         });
 
@@ -178,10 +186,9 @@ public class PlayerFragment extends DialogFragment {
             requestSongCurr.setAction(PlayerService.REQUEST_POSITION);
             getActivity().sendBroadcast(requestSongCurr);
 
-            Track currentTrack = (Track)tracks.getItem(currentSongIndex);
-            updateUIComponents(currentTrack);
+            updateUIComponents(currentSongIndex);
         } else {
-            playSong(selectedTrack);
+            playSong(currentSongIndex);
         }
 
         return v;
@@ -199,7 +206,7 @@ public class PlayerFragment extends DialogFragment {
     public void onDestroy() {
         try {
             getActivity().unregisterReceiver(mReceiver);
-        } catch ( IllegalArgumentException e ) {
+        } catch (IllegalArgumentException e) {
             Log.e(TAG, e.getMessage());
         }
 
@@ -214,21 +221,21 @@ public class PlayerFragment extends DialogFragment {
         }
     }
 
-    private void playSong(Track t) {
+    private void playSong(int index) {
         playing = true;
-        updateUIComponents(t);
+        updateUIComponents(index);
         Intent playIntent = new Intent(getActivity(), PlayerService.class);
-        playIntent.putExtra(PlayerService.STREAM_URL, t.preview_url);
+        playIntent.putExtra(PlayerService.STREAM_URL, previewURLs.get(index));
         playIntent.setAction(PlayerService.ACTION_PLAY);
         getActivity().startService(playIntent);
     }
 
-    private void updateUIComponents(Track t) {
+    private void updateUIComponents(int index) {
         updatePlayPauseIcon();
 
-        songName.setText(t.name);
-        artistName.setText(t.artists.get(0).name);
-        albumName.setText(t.album.name);
-        Picasso.with(getActivity()).load(t.album.images.get(0).url).into(albumArt);
+        songName.setText(titles.get(index));
+        artistName.setText(artists.get(index));
+        albumName.setText(albums.get(index));
+        Picasso.with(getActivity()).load(artwork.get(index)).into(albumArt);
     }
 }

@@ -31,6 +31,7 @@ public class ArtistSearchFragment extends Fragment {
     public final static String ARTIST_ID = "io.adie.project1.ARTIST_ID";
     public final static String ARTIST_NAME = "io.adie.project1.ARTIST_NAME";
     public final static String ARTIST_RESULTS = "io.adie.project1.ARTIST_RESULTS";
+    public final static String ARTIST_DATA = "io.adie.project1.ARTIST_DATA";
 
     static final String TAG = ArtistSearchFragment.class.getSimpleName();
     final Runnable failedSearch = new Runnable() {
@@ -76,13 +77,12 @@ public class ArtistSearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
                 Artist chosenArtist = (Artist) adapter.getItem(position);
+                Bundle b = new Bundle();
+                b.putString(ArtistSearchFragment.ARTIST_NAME, chosenArtist.name);
+                b.putString(ArtistSearchFragment.ARTIST_ID, chosenArtist.id);
 
                 if(ArtistSearchActivity.isMasterDetails) {
                     TopTracksFragment f = new TopTracksFragment();
-
-                    Bundle b = new Bundle();
-                    b.putString(ArtistSearchFragment.ARTIST_NAME, chosenArtist.name);
-                    b.putString(ArtistSearchFragment.ARTIST_ID, chosenArtist.id);
 
                     f.setArguments(b);
 
@@ -92,8 +92,7 @@ public class ArtistSearchFragment extends Fragment {
                 }
                 else {
                     Intent intent = new Intent(getActivity(), TopTracksActivity.class);
-                    intent.putExtra(ARTIST_ID, chosenArtist.id);
-                    intent.putExtra(ARTIST_NAME, chosenArtist.name);
+                    intent.putExtra(ARTIST_DATA, b);
                     startActivity(intent);
                 }
             }

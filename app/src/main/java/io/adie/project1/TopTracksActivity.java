@@ -23,22 +23,18 @@ public class TopTracksActivity extends AppCompatActivity {
         Intent intent = getIntent();
         artistName = intent.getStringExtra(ArtistSearchFragment.ARTIST_NAME);
         artistId = intent.getStringExtra(ArtistSearchFragment.ARTIST_ID);
-        TrackListAdapter adapter = intent.getParcelableExtra(TopTracksFragment.SONG_RESULTS);
 
         actionBarSetup(artistName);
 
         TopTracksFragment f = new TopTracksFragment();
 
-        Bundle b = new Bundle();
-        b.putString(ArtistSearchFragment.ARTIST_NAME, artistName);
-        b.putString(ArtistSearchFragment.ARTIST_ID, artistId);
-        b.putParcelable(TopTracksFragment.SONG_RESULTS, adapter);
+        Bundle b = intent.getBundleExtra(ArtistSearchFragment.ARTIST_DATA);
 
         f.setArguments(b);
 
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.top_tracks_container, f).addToBackStack(TAG).commit();
+        transaction.replace(R.id.top_tracks_container, f).addToBackStack(TAG).commit();
 
 
     }
