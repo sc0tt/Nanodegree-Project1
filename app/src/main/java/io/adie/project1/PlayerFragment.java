@@ -29,6 +29,7 @@ public class PlayerFragment extends DialogFragment {
     static final String IS_PLAYING = "io.adie.project1.IS_PLAYING";
 
     int currentSongIndex;
+    TrackListAdapter tracks;
 
     TextView songName;
     TextView artistName;
@@ -67,7 +68,13 @@ public class PlayerFragment extends DialogFragment {
         nextTrack = (ImageButton) v.findViewById(R.id.nextTrack);
         seekBar = (SeekBar) v.findViewById(R.id.song_seek_bar);
 
-        Track selectedTrack = TopTracksFragment.tracks.get(currentSongIndex);
+        Bundle args = getArguments();
+
+        tracks = args.getParcelable(TopTracksFragment.SONG_RESULTS);
+        currentSongIndex = args.getInt(TopTracksFragment.SONG_INDEX);
+
+
+        Track selectedTrack = (Track)tracks.getItem(currentSongIndex);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -95,12 +102,12 @@ public class PlayerFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (currentSongIndex == 0) {
-                    currentSongIndex = (TopTracksFragment.tracks.size() - 1);
+                    currentSongIndex = (tracks.getCount() - 1);
                 } else {
                     currentSongIndex--;
                 }
 
-                Track selectedTrack = TopTracksFragment.tracks.get(currentSongIndex);
+                Track selectedTrack = (Track)tracks.getItem(currentSongIndex);
                 playSong(selectedTrack);
             }
         });
@@ -123,12 +130,12 @@ public class PlayerFragment extends DialogFragment {
         nextTrack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentSongIndex == (TopTracksFragment.tracks.size() - 1)) {
+                if (currentSongIndex == (tracks.getCount() - 1)) {
                     currentSongIndex = 0;
                 } else {
                     currentSongIndex++;
                 }
-                Track selectedTrack = TopTracksFragment.tracks.get(currentSongIndex);
+                Track selectedTrack = (Track)tracks.getItem(currentSongIndex);
                 playSong(selectedTrack);
             }
         });
@@ -171,7 +178,7 @@ public class PlayerFragment extends DialogFragment {
             requestSongCurr.setAction(PlayerService.REQUEST_POSITION);
             getActivity().sendBroadcast(requestSongCurr);
 
-            Track currentTrack = TopTracksFragment.tracks.get(currentSongIndex);
+            Track currentTrack = (Track)tracks.getItem(currentSongIndex);
             updateUIComponents(currentTrack);
         } else {
             playSong(selectedTrack);

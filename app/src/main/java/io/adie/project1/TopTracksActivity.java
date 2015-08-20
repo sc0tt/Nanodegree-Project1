@@ -23,6 +23,7 @@ public class TopTracksActivity extends AppCompatActivity {
         Intent intent = getIntent();
         artistName = intent.getStringExtra(ArtistSearchFragment.ARTIST_NAME);
         artistId = intent.getStringExtra(ArtistSearchFragment.ARTIST_ID);
+        TrackListAdapter adapter = intent.getParcelableExtra(TopTracksFragment.SONG_RESULTS);
 
         actionBarSetup(artistName);
 
@@ -31,6 +32,7 @@ public class TopTracksActivity extends AppCompatActivity {
         Bundle b = new Bundle();
         b.putString(ArtistSearchFragment.ARTIST_NAME, artistName);
         b.putString(ArtistSearchFragment.ARTIST_ID, artistId);
+        b.putParcelable(TopTracksFragment.SONG_RESULTS, adapter);
 
         f.setArguments(b);
 

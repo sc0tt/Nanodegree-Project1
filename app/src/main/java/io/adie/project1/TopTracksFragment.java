@@ -29,7 +29,7 @@ public class TopTracksFragment extends Fragment {
     public final static String SONG_RESULTS = "io.adie.project1.SONG_RESULTS";
     public final static String SONG_INDEX = "io.adie.project1.SONG_INDEX";
     static final String TAG = TopTracksFragment.class.getSimpleName();
-    public static List<Track> tracks;
+    private List<Track> tracks;
     final Runnable failedSearch = new Runnable() {
         @Override
         public void run() {
@@ -98,6 +98,7 @@ public class TopTracksFragment extends Fragment {
                     PlayerFragment f = new PlayerFragment();
                     Bundle b = new Bundle();
                     b.putInt(TopTracksFragment.SONG_INDEX, position);
+                    b.putParcelable(SONG_RESULTS, adapter);
 
                     f.setArguments(b);
 
@@ -108,6 +109,7 @@ public class TopTracksFragment extends Fragment {
                 else {
                     Intent intent = new Intent(getActivity(), PlayerActivity.class);
                     intent.putExtra(SONG_INDEX, position);
+                    intent.putExtra(SONG_RESULTS, adapter);
                     startActivity(intent);
                 }
 
@@ -119,10 +121,8 @@ public class TopTracksFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle savedState) {
-
         super.onSaveInstanceState(savedState);
 
-        // Note: getValues() is a method in your ArrayAdaptor subclass
         savedState.putParcelable(SONG_RESULTS, adapter);
 
     }
